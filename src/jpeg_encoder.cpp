@@ -154,6 +154,11 @@ JpegEncoder::encode()
         if (!rgb_data) throw "malloc failed in JpegEncoder::encode/bgr_to_rgb.";
         break;
 
+    case BUF_YUV420:
+        rgb_data = yuv420_to_rgb(data, width*height + width*height/2, width, height);
+        if (!rgb_data) throw "malloc failed in JpegEncoder::encode/yuv420_to_rgb.";
+        break;
+
     case BUF_RGB:
         rgb_data = data;
         break;
@@ -175,7 +180,7 @@ JpegEncoder::encode()
     jpeg_finish_compress(&cinfo);
     jpeg_destroy_compress(&cinfo);
 
-    if (buf_type == BUF_BGR || buf_type == BUF_RGBA || buf_type == BUF_BGRA)
+    if (buf_type == BUF_BGR || buf_type == BUF_RGBA || buf_type == BUF_BGRA || buf_type == BUF_YUV420)
         free(rgb_data);
 }
 

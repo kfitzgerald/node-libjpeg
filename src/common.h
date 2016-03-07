@@ -28,8 +28,9 @@ bool str_eq(const char *s1, const char *s2);
 unsigned char *rgba_to_rgb(const unsigned char *rgba, int rgba_size);
 unsigned char *bgra_to_rgb(const unsigned char *rgba, int bgra_size);
 unsigned char *bgr_to_rgb(const unsigned char *rgb, int rgb_size);
+unsigned char *yuv420_to_rgb(const unsigned char *yuv, int yuv_size, int width, int height);
 
-typedef enum { BUF_RGB, BUF_BGR, BUF_RGBA, BUF_BGRA } buffer_type;
+typedef enum { BUF_RGB, BUF_BGR, BUF_RGBA, BUF_BGRA, BUF_YUV420 } buffer_type;
 
 struct encode_request {
     Nan::Callback* callback;

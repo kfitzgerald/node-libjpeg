@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <cassert>
+#include <math.h>
 #include "common.h"
 
 using namespace v8;
@@ -56,6 +57,53 @@ bgr_to_rgb(const unsigned char *bgr, int bgr_size)
         rgb[i+1] = bgr[i+1];
         rgb[i+2] = bgr[i];
     }
+    return rgb;
+}
+
+int clamp(double n) {
+    if (n < 0) {
+        return 0;
+    } else if (n > 255) {
+        return 255;
+    } else {
+        return (int)floor(n + 0.5);
+    }
+}
+
+unsigned char *
+yuv420_to_rgb(const unsigned char *yuv, int yuv_size, int width, int height)
+{
+    assert(yuv_size%6==0);
+
+    int pixels = width * height;
+    int rgb_size = pixels * 3;
+    unsigned char *rgb = (unsigned char *)malloc(sizeof(*rgb)*rgb_size);
+    if (!rgb) return NULL;
+
+    for (int py = 0 ; py < height; py++) {
+        for (int px = 0 ; px < width; px++) {
+            int pos = py * width + px;
+
+            // Extract
+            double y = yuv[pos];
+            double u = yuv[(py / 2) * (width / 2) + (px / 2) + pixels];
+            double v = yuv[(py / 2) * (width / 2) + (px / 2) + pixels + (pixels / 4)];
+
+            // Normalize
+            y = y / 255;
+            u = u / 255;
+            v = v / 255;
+
+            // Convert
+            // These numbers come from ImageMagick colorspace.c
+            // https://github.com/ImageMagick/ImageMagick/blob/master/MagickCore/colorspace.c#L1441
+            // http://www.imagemagick.org/script/license.php
+            rgb[pos * 3] = clamp((y-3.945707070708279e-05*(u-0.5)+1.1398279671717170825*(v-0.5)) * 255);
+            rgb[pos * 3 + 1] = clamp((y-0.3946101641414141437*(u-0.5)-0.5805003156565656797*(v-0.5)) * 255);
+            rgb[pos * 3 + 2] = clamp((y+2.0319996843434342537*(u-0.5)-4.813762626262513e-04*(v-0.5)) * 255);
+        }
+    }
+
     return rgb;
 }
 

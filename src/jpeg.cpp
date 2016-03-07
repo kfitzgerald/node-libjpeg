@@ -87,14 +87,14 @@ NAN_METHOD(Jpeg::New)
     buffer_type buf_type = BUF_RGB;
     if (info.Length() == 4) {
         if (!info[3]->IsString()) {
-            Nan::ThrowError("Fifth argument must be a string. Either 'rgb', 'bgr', 'rgba' or 'bgra'.");
+            Nan::ThrowError("Fifth argument must be a string. Either 'rgb', 'bgr', 'rgba', 'bgra' or 'yuv420'.");
         }
 
         Nan::Utf8String bt(info[3]->ToString());
         if (!(str_eq(*bt, "rgb") || str_eq(*bt, "bgr") ||
-            str_eq(*bt, "rgba") || str_eq(*bt, "bgra")))
+            str_eq(*bt, "rgba") || str_eq(*bt, "bgra") || str_eq(*bt, "yuv420")))
         {
-            Nan::ThrowError("Buffer type must be 'rgb', 'bgr', 'rgba' or 'bgra'.");
+            Nan::ThrowError("Buffer type must be 'rgb', 'bgr', 'rgba', 'bgra' or 'yuv420'.");
         }
 
         if (str_eq(*bt, "rgb")) {
@@ -105,8 +105,10 @@ NAN_METHOD(Jpeg::New)
             buf_type = BUF_RGBA;
         } else if (str_eq(*bt, "bgra")) {
             buf_type = BUF_BGRA;
+        } else if (str_eq(*bt, "yuv420")) {
+            buf_type = BUF_YUV420;
         } else {
-            Nan::ThrowError("Buffer type wasn't 'rgb', 'bgr', 'rgba' or 'bgra'.");
+            Nan::ThrowError("Buffer type wasn't 'rgb', 'bgr', 'rgba', 'bgra' or 'yuv420.");
         }
     }
 
